@@ -65,6 +65,8 @@
   sudo ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
   sudo reboot
   ```
+- Install Docker  
+  https://github.com/EknarongAphiphutthikul/Install-Docker
 ----
 
 <br/>
