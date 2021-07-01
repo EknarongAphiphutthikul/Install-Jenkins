@@ -137,3 +137,7 @@
   sudo ufw reload
   sudo ufw status
   ```
+- Administrator password
+  ```sh
+   docker exec jenkins  more /var/jenkins_home/secrets/initialAdminPassword
+  ```
