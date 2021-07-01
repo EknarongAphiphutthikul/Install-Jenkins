@@ -67,8 +67,73 @@
   ```
 - Install Docker  
   https://github.com/EknarongAphiphutthikul/Install-Docker
+
+- Install Docker Compose
+  ```sh 
+  sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+  sudo chmod +x /usr/local/bin/docker-compose
+
+  sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+  docker-compose --version
+  ```
 ----
 
 <br/>
 
 ## Install Jenkins
+- Install Local Persist Volume Plugin  
+  - https://unix.stackexchange.com/questions/439106/docker-create-a-persistent-volume-in-a-specific-directory  
+  - https://github.com/MatchbookLab/local-persist  
+  - https://stackoverflow.com/questions/63227362/docker-volumes-create-options-driver
+  ```sh
+  curl -fsSL https://raw.githubusercontent.com/MatchbookLab/local-persist/master/scripts/install.sh | sudo bash
+  ```
+- Create Volume
+  ```sh
+  docker volume create -d local-persist --opt mountpoint=/home/akeadm/jenkins/data --name jenkins-data-volume
+
+  docker volume create -d local-persist --opt mountpoint=/home/akeadm/jenkins/cert --name jenkins-cert-volume
+  ```
+- Create certificate  
+  [How to create certificates](https://github.com/EknarongAphiphutthikul/OpenSSL-Certificate-Authority)  
+  ```sh
+  mkdir /home/akeadm/jenkins/cert
+  ```
+  copy jenkins.key.pem jenkins.cert.pem to /home/akeadm/temp
+  ```sh
+  cd /home/akeadm/temp
+
+  openssl rsa -in jenkins.key.pem -out /home/akeadm/jenkins/cert/key.pem -passin pass:changeit
+  
+  mv jenkins.cert.pem /home/akeadm/jenkins/cert/cert.pem
+
+  rm /home/akeadm/temp/*
+  ```
+- Copy config  
+  copy log.properties to /home/akeadm/jenkins/data/log.properties
+
+- Install Jenkins  
+  ```sh
+  docker container run --name jenkins \
+   --detach --restart unless-stopped \
+   --env JENKINS_OPTS="-Djava.util.logging.config.file=/var/jenkins_home/log.properties --httpPort=-1 --httpsPort=2376 --httpsCertificate=/certs/client/cert.pem --httpsPrivateKey=/certs/client/key.pem" \
+   --volume jenkins-cert-volume:/certs/client:ro \
+   --volume jenkins-data-volume:/var/jenkins_home:rw \
+   --publish 2376:2376 --publish 50000:50000 \
+   jenkins:2.60.3
+
+  docker ps
+  ```
+  ```console
+  CONTAINER ID   IMAGE            COMMAND                  CREATED          STATUS          PORTS                                                                                                NAMES
+  cfaa28b7768a   jenkins:2.60.3   "/bin/tini -- /usr/l…"   17 seconds ago   Up 16 seconds   0.0.0.0:2376->2376/tcp, :::2376->2376/tcp, 0.0.0.0:50000->50000/tcp, :::50000->50000/tcp, 8080/tcp   jenkins
+  ```
+- Enable firewall
+  ```sh
+  sudo ufw allow 2376/tcp
+  sudo ufw allow 50000/tcp
+  sudo ufw reload
+  sudo ufw status
+  ```
