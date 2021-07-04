@@ -122,13 +122,13 @@
    --volume jenkins-cert-volume:/certs/client:ro \
    --volume jenkins-data-volume:/var/jenkins_home:rw \
    --publish 2376:2376 --publish 50000:50000 \
-   jenkins:2.60.3
+   jenkinsci/blueocean:1.25.0-alpha-1-bcc31d32159f
 
   docker ps
   ```
   ```console
-  CONTAINER ID   IMAGE            COMMAND                  CREATED          STATUS          PORTS                                                                                                NAMES
-  cfaa28b7768a   jenkins:2.60.3   "/bin/tini -- /usr/l…"   17 seconds ago   Up 16 seconds   0.0.0.0:2376->2376/tcp, :::2376->2376/tcp, 0.0.0.0:50000->50000/tcp, :::50000->50000/tcp, 8080/tcp   jenkins
+  CONTAINER ID   IMAGE                                             COMMAND                  CREATED              STATUS              PORTS                                                                                                NAMES
+  a997bb301f30   jenkinsci/blueocean:1.25.0-alpha-1-bcc31d32159f   "/sbin/tini -- /usr/…"   About a minute ago   Up About a minute   0.0.0.0:2376->2376/tcp, :::2376->2376/tcp, 0.0.0.0:50000->50000/tcp, :::50000->50000/tcp, 8080/tcp   jenkins
   ```
 - Enable firewall
   ```sh
